@@ -53,17 +53,17 @@ function Watch-Band() {
 }
 
 while ($true) {
-    $input = Read-Host "Command (info, bounce, watch-band, exit)"
-    if ($input -eq 'info') {
+    $userInput = Read-Host "Command (info, bounce, watch-band, exit)"
+    if ($userInput -eq 'info') {
         Get-WifiDetails
     }
-    elseif ($input -eq 'bounce') {
+    elseif ($userInput -eq 'bounce') {
         Restart-Wifi
     }
-    elseif ($input -eq 'watch-band') {
+    elseif ($userInput -eq 'watch-band') {
         Watch-Band
     }
-    elseif ($input -eq 'exit') {
+    elseif ($userInput -eq 'exit') {
         break
     } 
 }
