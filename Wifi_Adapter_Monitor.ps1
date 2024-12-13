@@ -15,7 +15,7 @@ function Get-WifiDetails() {
 function Restart-Wifi() {
     $currentSSID = (netsh wlan show interfaces | Select-String 'SSID' | Select-Object -First 1).ToString().Split(':')[1].Trim()
 
-    if($currentSSID -eq "") {
+    if ($currentSSID -eq "") {
         Write-Host "No WiFi network connected so not bouncing"
         return
     }
@@ -30,13 +30,40 @@ function Restart-Wifi() {
     Write-Host "Reconnecting to WiFi network: $currentSSID"
 }
 
+function Watch-Band() {
+    Write-Host "Monitoring WiFi band... (close powershell window to stop)"
+
+    while ($true) {
+        $wifiDetails = netsh wlan show interfaces
+        $band = ($wifiDetails | Select-String 'Band' | Select-Object -First 1).ToString().Split(':')[1].Trim()
+        $time = Get-Date -Format "HH:mm:ss"
+        if ($band -eq "2.4 GHz") {
+            Write-Host "[$time] 2.4 GHz band detected, restarting WiFi for better performance"
+            Restart-Wifi
+        }
+        elseif ($band -eq "5 GHz") {
+            Write-Host "[$time] 5 GHz band detected, no action needed"
+        }
+        else {
+            Write-Host "[$time] Unknown band detected"
+        }
+
+        Start-Sleep -Seconds 10
+    }
+}
+
 while ($true) {
-    $input = Read-Host "Command (info, bounce, exit)"
+    $input = Read-Host "Command (info, bounce, watch-band, exit)"
     if ($input -eq 'info') {
         Get-WifiDetails
-    } elseif ($input -eq 'bounce') {
+    }
+    elseif ($input -eq 'bounce') {
         Restart-Wifi
-    } elseif ($input -eq 'exit') {
+    }
+    elseif ($input -eq 'watch-band') {
+        Watch-Band
+    }
+    elseif ($input -eq 'exit') {
         break
-    } Start-Sleep -Seconds 1
+    } 
 }
